@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dohmoku
 {
 	public enum Team { Black, White }
 
-	public class Game
+	class Game
 	{
 		public Team player;					// Current player
 		int[,] board = new int[19, 19];		// Gomoku board. Location is [column#, row#]. 0: empty, 1: black, 2: white
