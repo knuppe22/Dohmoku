@@ -23,12 +23,16 @@ namespace Dohmoku
 			while (winner == null)
 			{
 				DrawBoard();
-				Console.WriteLine(current.ToString("g") + " team's turn. Enter coordinate to place stone with the format of \"x y\"."); // TODO: Change to j 10, make exception handling
-				string str = Console.ReadLine();
-				string[] val = str.Split(' ');
-				int x = int.Parse(val[0]) - 1;
-				int y = int.Parse(val[1]) - 1;
-				if (x < 0 || x > 18 || y < 0 || y > 18)
+				Console.WriteLine(current.ToString("g") + " team's turn. Enter location to place stone with the format of \"xy\", e.g., \"A1\".");
+				int[] location = Parser(Console.ReadLine());
+                if (location == null)
+                {
+                    Console.WriteLine("Wrong format! Enter again.");
+                    continue;
+                }
+                int x = location[0];
+                int y = location[1];
+				if (y > 18)
 				{
 					Console.WriteLine("Out of index! Enter again.");
 					continue;
@@ -39,12 +43,19 @@ namespace Dohmoku
 					continue;
 				}
 				Place(current, x, y);
-				current = (Team)(((int)current + 1) % 2);
-			}
 
-			Console.Clear();
+                if (IsEnded(current))
+                {
+                    winner = current;
+                }
+                else
+                {
+                    current = (Team)(((int)current + 1) % 2);
+                }
+			}
+            
 			DrawBoard();
-			Console.WriteLine(winner.Value.ToString("g") + " wins!");
+			Console.WriteLine(winner.Value.ToString("g") + " team wins!");
 		}
 		
 		void DrawBoard()		// Method drawing gomoku board
@@ -67,10 +78,9 @@ namespace Dohmoku
 				Console.WriteLine();
 			}
 		}
-
 		string Int2Char(int n)	// For DrawBoard method
 		{
-			switch(n)
+			switch (n)
 			{
 				case 0:
 					return "┼ ";
@@ -82,6 +92,48 @@ namespace Dohmoku
 					throw new Exception("Invalid data is stored");
 			}
 		}
+
+        int[] Parser(string s)  // Return { column#, row# } with the input of read string
+        {
+            int flag = 0;
+            int x = 0;
+            int y = 0;
+            bool enter = false;
+            foreach(char c in s)
+            {
+                switch (flag)
+                {
+                    case 0:
+                        if (c >= 'a' && c <= 's')
+                        {
+                            x = c - 'a';
+                            flag++;
+                        }
+                        else if (c >= 'A' && c <= 'S')
+                        {
+                            x = c - 'A';
+                            flag++;
+                        }
+                        break;
+                    case 1:
+                        if (c >= '0' && c <= '9')
+                        {
+                            enter = true;
+                            y = y * 10 + (c - '0');
+                        }
+                        else if (enter)
+                        {
+                            flag++;
+                        }
+                        break;
+                }
+            }
+            if (flag >= 1)
+            {
+                return new int[2] { x, y - 1 };
+            }
+            return null;
+        }
 
 		bool IsPlacable(int x, int y)	// Is board[x, y] is zero?
 		{
@@ -98,5 +150,10 @@ namespace Dohmoku
 				throw new Exception("Can't place here");
 			}
 		}
+
+        bool IsEnded(Team team)
+        {
+            return false;
+        }
 	}
 }

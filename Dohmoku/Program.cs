@@ -18,7 +18,7 @@ namespace Dohmoku
 				Console.WriteLine("Choose team. (B/W)");
 				Console.WriteLine("Q to exit.");
 				string str = Console.ReadLine();
-				switch(str)
+				switch (str)
 				{
 					case "B":
 					case "b":
