@@ -58,7 +58,7 @@ namespace Dohmoku
 			Console.WriteLine(winner.Value.ToString("g") + " team wins!");
 		}
 		
-		void DrawBoard()		// Method drawing gomoku board
+		void DrawBoard()		// Draw gomoku board
 		{
 			Console.Write("yx");
 			for (int i = 0; i < 19; i++)
@@ -93,7 +93,7 @@ namespace Dohmoku
 			}
 		}
 
-        int[] Parser(string s)  // Return { column#, row# } with the input of read string
+        int[] Parser(string s)  // Return { column#, row# } with the input string of player
         {
             int flag = 0;
             int x = 0;
@@ -135,8 +135,12 @@ namespace Dohmoku
             return null;
         }
 
-		bool IsPlacable(int x, int y)	// Is board[x, y] is zero?
+		bool IsPlacable(int x, int y)	// Is board[x, y] is empty?
 		{
+            if (x < 0 || x > 18 || y < 0 || y > 18)
+            {
+                return false;
+            }
 			return board[x, y] == 0;
 		}
 		void Place(Team team, int x, int y)	// Place team's stone in board[x, y]
@@ -153,6 +157,74 @@ namespace Dohmoku
 
         bool IsEnded(Team team)
         {
+            int target = (int)team + 1;
+            int count = 0;
+            for (int i = 0; i < 19; i++)    // Check | form
+            {
+                for (int j = 0; j < 19; j++)
+                {
+                    if (board[i, j] == target)
+                    {
+                        count++;
+                        if (count >= 5)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        count = 0;
+                    }
+                }
+                count = 0;
+            }
+            for (int i = 0; i < 19; i++)    // Check - form
+            {
+                for (int j = 0; j < 19; j++)
+                {
+                    if (board[j, i] == target)
+                    {
+                        count++;
+                        if (count >= 5)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        count = 0;
+                    }
+                }
+                count = 0;
+            }
+            for (int i = 0; i < 15; i++)    // Check \ form
+            {
+                for (int j = 0; j < 15; j++)
+                {
+                    if (board[i, j] == target &&
+                        board[i + 1, j + 1] == target &&
+                        board[i + 2, j + 2] == target &&
+                        board[i + 3, j + 3] == target &&
+                        board[i + 4, j + 4] == target)
+                    {
+                        return true;
+                    }
+                }
+            }
+            for (int i = 4; i < 19; i++)    // Check / form
+            {
+                for (int j = 0; j < 15; j++)
+                {
+                    if (board[i, j] == target &&
+                        board[i - 1, j + 1] == target &&
+                        board[i - 2, j + 2] == target &&
+                        board[i - 3, j + 3] == target &&
+                        board[i - 4, j + 4] == target)
+                    {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 	}
