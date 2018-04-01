@@ -6,7 +6,7 @@ namespace Dohmoku
 	{
 		static void Main(string[] args)
 		{
-			Game game = new Game();
+            Game game = null;
 			bool isTeamSelected = false;
 			
 			while(!isTeamSelected)
@@ -18,12 +18,12 @@ namespace Dohmoku
 				{
 					case "B":
 					case "b":
-						game.player = Team.Black;
+                        game = new Game(Team.Black);
 						isTeamSelected = true;
 						break;
 					case "W":
 					case "w":
-						game.player = Team.White;
+                        game = new Game(Team.White);
 						isTeamSelected = true;
 						break;
 					case "Q":
@@ -35,7 +35,10 @@ namespace Dohmoku
 						break;
 				}
 			}
-			game.Start();
+            if (game != null)
+            {
+                game.Start();
+            }
 		}
 	}
 }

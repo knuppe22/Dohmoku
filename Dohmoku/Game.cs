@@ -6,10 +6,17 @@ namespace Dohmoku
 
 	class Game
 	{
-		public Team player;					// Current player
+		Team player;					    // Current player
 		int[,] board = new int[19, 19];		// Gomoku board. Location is [column#, row#]. 0: empty, 1: black, 2: white
 		Team current = Team.Black;			// Current playing player
 		Team? winner = null;				// Winner of the game. Initialized by null.
+        AI ai;
+
+        public Game(Team playerTeam)
+        {
+            player = playerTeam;
+            ai = new AI(playerTeam);
+        }
 
 		public void Start()
 		{
@@ -19,26 +26,36 @@ namespace Dohmoku
 			while (winner == null)
 			{
 				DrawBoard();
-				Console.WriteLine(current.ToString("g") + " team's turn. Enter location to place stone with the format of \"xy\", e.g., \"A1\".");
-				int[] location = Parser(Console.ReadLine());
-                if (location == null)
+                if (current == player)  // If player's turn
                 {
-                    Console.WriteLine("Wrong format! Enter again.");
-                    continue;
+                    Console.WriteLine(current.ToString("g") + " team's turn. Enter location to place stone with the format of \"xy\", e.g., \"A1\".");
+                    int[] location = Parser(Console.ReadLine());
+                    if (location == null)
+                    {
+                        Console.WriteLine("Wrong format! Enter again.");
+                        continue;
+                    }
+                    int x = location[0];
+                    int y = location[1];
+                    if (y > 18)
+                    {
+                        Console.WriteLine("Out of index! Enter again.");
+                        continue;
+                    }
+                    else if (!IsPlacable(x, y))
+                    {
+                        Console.WriteLine("You cannot place here! Enter again.");
+                        continue;
+                    }
+                    Place(current, x, y);
                 }
-                int x = location[0];
-                int y = location[1];
-				if (y > 18)
-				{
-					Console.WriteLine("Out of index! Enter again.");
-					continue;
-				}
-				else if (!IsPlacable(x, y))
-				{
-					Console.WriteLine("You cannot place here! Enter again.");
-					continue;
-				}
-				Place(current, x, y);
+                else // If AI's turn
+                {
+                    Console.WriteLine(current.ToString("g") + " team(AI)'s turn.");
+                    int[] result = ai.Think(board);
+                    Console.WriteLine("AI placed its stone in " + (char)(result[0] + 'A') + (result[1] + 1));
+                    Place(current, result);
+                }
 
                 if (IsEnded(current))
                 {
@@ -150,6 +167,17 @@ namespace Dohmoku
 				throw new Exception("Can't place here");
 			}
 		}
+        void Place(Team team, int[] xy)
+        {
+            if (xy.Length != 2)
+            {
+                throw new Exception("Invalid int[] input");
+            }
+            else
+            {
+                Place(team, xy[0], xy[1]);
+            }
+        }
 
         bool IsEnded(Team team)
         {
