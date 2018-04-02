@@ -3,6 +3,13 @@
 namespace Dohmoku
 {
 	public enum Team { Black, White }
+	public static class MethodsForTeam
+	{
+		public static Team Opposite(this Team team)
+		{
+			return (Team)(((int)team + 1) % 2);
+		}
+	}
 
 	class Game
 	{
@@ -28,7 +35,7 @@ namespace Dohmoku
 				DrawBoard();
                 if (current == player)  // If player's turn
                 {
-                    Console.WriteLine(current.ToString("g") + " team's turn. Enter location to place stone with the format of \"xy\", e.g., \"A1\".");
+                    Console.WriteLine(current + " team's turn. Enter location to place stone with the format of \"xy\", e.g., \"A1\".");
                     int[] location = Parser(Console.ReadLine());
                     if (location == null)
                     {
@@ -51,9 +58,9 @@ namespace Dohmoku
                 }
                 else // If AI's turn
                 {
-                    Console.WriteLine(current.ToString("g") + " team(AI)'s turn.");
+                    Console.WriteLine(current + " team(AI)'s turn.");
                     int[] result = ai.Think(board);
-                    Console.WriteLine("AI placed its stone in " + (char)(result[0] + 'A') + (result[1] + 1));
+                    Console.WriteLine("AI placed stone in " + (char)(result[0] + 'A') + (result[1] + 1));
                     Place(current, result);
                 }
 
@@ -63,12 +70,12 @@ namespace Dohmoku
                 }
                 else
                 {
-                    current = (Team)(((int)current + 1) % 2);
+                    current = current.Opposite();
                 }
 			}
             
 			DrawBoard();
-			Console.WriteLine(winner.Value.ToString("g") + " team wins!");
+			Console.WriteLine(winner.Value + " team wins!");
 		}
 		
 		void DrawBoard()		// Draw gomoku board

@@ -12,7 +12,7 @@ namespace Dohmoku
 
         public AI(Team playerTeam)
         {
-            team = (Team)(((int)playerTeam + 1) % 2);
+            team = playerTeam.Opposite();
         }
 
         public int[] Think(int[,] board)       // Return AI's result coordination with an input of current board. TODO: make this method
