@@ -9,24 +9,24 @@ namespace Dohmoku
     class AI
     {
         public Team team;
-
+		
         public AI(Team playerTeam)
         {
             team = playerTeam.Opposite();
         }
 
-        public int[] Think(int[,] board)       // Return AI's result coordination with an input of current board. TODO: make this method
+        public int[] Think()		// Return AI's result coordination with an input of current board. TODO: make this method
         {
             int[] result;
             do
             {
                 result = Random();
-            } while (board[result[0], result[1]] != 0);
+            } while (!Game.IsPlacable(result));
 
             return result;
         }
 
-        int[] Random()      // Return 2 random integers from 0 to 18. For sample.
+        int[] Random()				// Return 2 random integers from 0 to 18. For sample.
         {
             Random r = new Random();
             int x = r.Next(0, 19);

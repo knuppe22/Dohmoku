@@ -14,7 +14,7 @@ namespace Dohmoku
 	class Game
 	{
 		Team player;					    // Current player
-		int[,] board = new int[19, 19];		// Gomoku board. Location is [column#, row#]. 0: empty, 1: black, 2: white
+		public static int[,] board = new int[19, 19];		// Gomoku board. Location is [column#, row#]. 0: empty, 1: black, 2: white
 		Team current = Team.Black;			// Current playing player
 		Team? winner = null;				// Winner of the game. Initialized by null.
         AI ai;
@@ -33,7 +33,7 @@ namespace Dohmoku
 			while (winner == null)
 			{
 				DrawBoard();
-                if (current == player)  // If player's turn
+                if (current == player)		// If player's turn
                 {
                     Console.WriteLine(current + " team's turn. Enter location to place stone with the format of \"xy\", e.g., \"A1\".");
                     int[] location = Parser(Console.ReadLine());
@@ -56,11 +56,11 @@ namespace Dohmoku
                     }
                     Place(current, x, y);
                 }
-                else // If AI's turn
+                else	// If AI's turn
                 {
                     Console.WriteLine(current + " team(AI)'s turn.");
-                    int[] result = ai.Think(board);
-                    Console.WriteLine("AI placed stone in " + (char)(result[0] + 'A') + (result[1] + 1));
+                    int[] result = ai.Think();
+                    Console.WriteLine("AI placed stone in " + (char)(result[0] + 'A') + (result[1] + 1) + ".");
                     Place(current, result);
                 }
 
@@ -76,6 +76,7 @@ namespace Dohmoku
             
 			DrawBoard();
 			Console.WriteLine(winner.Value + " team wins!");
+			Console.WriteLine(winner == player ? "You win!" : "You lose...");
 		}
 		
 		void DrawBoard()		// Draw gomoku board
@@ -155,7 +156,7 @@ namespace Dohmoku
             return null;
         }
 
-		bool IsPlacable(int x, int y)	// Is board[x, y] is empty?
+		public static bool IsPlacable(int x, int y)	// Is board[x, y] is empty?
 		{
             if (x < 0 || x > 18 || y < 0 || y > 18)
             {
@@ -163,7 +164,19 @@ namespace Dohmoku
             }
 			return board[x, y] == 0;
 		}
-		void Place(Team team, int x, int y)	// Place team's stone in board[x, y]
+		public static bool IsPlacable(int[] xy)
+		{
+			if (xy.Length != 2)
+			{
+				throw new Exception("Invalid int[] input");
+			}
+			else
+			{
+				return IsPlacable(xy[0], xy[1]);
+			}
+		}
+
+		void Place(Team team, int x, int y)			// Place team's stone in board[x, y]
 		{
 			if (IsPlacable(x, y))
 			{
