@@ -34,5 +34,25 @@ namespace Dohmoku
 
             return new int[2] { x, y };
         }
+
+        double Calculate(int[,] board)  // Evaluation function. TODO: fill this method
+        {
+            return 0;
+        }
+
+        double AlphaBeta(TreeNode node, int depth , double alpha, double beta, bool maximizing)
+        {
+            return 0;   // TODO
+        }
+    }
+
+    class Tree
+    {
+        // TODO: Make tree addchild deletechild
+    }
+
+    class TreeNode
+    {
+        // TODO
     }
 }
