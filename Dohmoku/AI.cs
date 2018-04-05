@@ -1,36 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dohmoku
 {
     class AI
     {
-        public Team team;
-        int depth = 4;
-		
-        public AI(Team playerTeam)
-        {
-            team = playerTeam.Opposite();
-        }
+        int maxDepth = 4;      // How deep AI can see?
 
         public int[] Think()		// Return AI's result coordination with an input of current board. TODO: make this method
         {
-            Tree tree = new Tree(Game.board);
-
-
-            for (int i = 0; i < depth; i++)
-            {
-                
-            }
+            Tree tree = new Tree(Game.player.Opposite(), Game.board);
+            MakeTree(tree, 0);
 
             int[] result;
             do
             {
                 result = Random();
-            } while (!Game.IsPlacable(result));
+            } while (!Game.IsPlacable(Game.board, result));
 
             return result;
         }
@@ -44,34 +30,64 @@ namespace Dohmoku
             return new int[2] { x, y };
         }
 
-        double Calculate(int[,] board)  // Evaluation function. TODO: fill this method
+        void MakeTree(Tree root, int depth)
         {
-            return 0;
+            if (depth < maxDepth)
+            {
+                for (int i = 0; i < 19; i++)
+                {
+                    for (int j = 0; j < 19; j++)
+                    {
+                        if (Game.IsPlacable(root.value, i, j))
+                        {
+                            int[,] newBoard = new int[19, 19];
+                            Array.Copy(root.value, newBoard, root.value.Length);
+                            newBoard[i, j] = (int)(root.team.Opposite());
+                            root.AddChild(new Tree(root.team.Opposite(), newBoard));
+                        }
+                    }
+                }
+                for (int i = 0; i < root.children.Count; i++)
+                {
+                    MakeTree(root.children[i], depth + 1);
+                }
+            }
         }
 
-        double AlphaBeta(Tree tree, int depth , double alpha, double beta, bool maximizing)
+        double AlphaBeta(Tree tree, int depth, double alpha, double beta, bool maximizing)
         {
             return 0;   // TODO
+        }
+
+        // Evaluation function. TODO: fill this method
+        double Calculate(int[,] board)
+        {
+            return 0;
         }
     }
 
     class Tree
     {
-        // TODO: Make tree addchild deletechild
+        public Tree parent = null;
+        public List<Tree> children = new List<Tree>();
 
-        Tree parent;
-        List<Tree> children;
+        public Team team;       // Who's turn at the value state?
+        public int[,] value = new int[19, 19];
+        public double heuristic;
 
-        int[,] value;
-        double heuristic;
+        public double alpha;
+        public double beta;
 
-        double alpha;
-        double beta;
-        bool maximizer;
-
-        public Tree(int [,] board)
+        public Tree(Team team, int[,] board)
         {
-            value = board;
+            this.team = team;
+            Array.Copy(board, value, board.Length);
+        }
+
+        public void AddChild(Tree child)
+        {
+            children.Add(child);
+            child.parent = this;
         }
     }
 }

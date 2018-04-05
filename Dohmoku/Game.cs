@@ -2,18 +2,18 @@
 
 namespace Dohmoku
 {
-	public enum Team { Black, White }
+	public enum Team { Black = 1, White }
 	public static class MethodsForTeam
 	{
 		public static Team Opposite(this Team team)
 		{
-			return (Team)(((int)team + 1) % 2);
+			return (Team)((int)team % 2 + 1);
 		}
 	}
 
 	class Game
 	{
-		Team player;					    // Current player
+		public static Team player;					    // Current player
 		public static int[,] board = new int[19, 19];		// Gomoku board. Location is [column#, row#]. 0: empty, 1: black, 2: white
 		Team current = Team.Black;			// Current playing player
 		Team? winner = null;				// Winner of the game. Initialized by null.
@@ -22,7 +22,7 @@ namespace Dohmoku
         public Game(Team playerTeam)
         {
             player = playerTeam;
-            ai = new AI(playerTeam);
+            ai = new AI();
         }
 
 		public void Start()
@@ -49,7 +49,7 @@ namespace Dohmoku
                         Console.WriteLine("Out of index! Enter again.");
                         continue;
                     }
-                    else if (!IsPlacable(x, y))
+                    else if (!IsPlacable(board, x, y))
                     {
                         Console.WriteLine("You cannot place here! Enter again.");
                         continue;
@@ -156,7 +156,7 @@ namespace Dohmoku
             return null;
         }
 
-		public static bool IsPlacable(int x, int y)	// Is board[x, y] is empty?
+		public static bool IsPlacable(int[,] board, int x, int y)	// Is board[x, y] is empty?
 		{
             if (x < 0 || x > 18 || y < 0 || y > 18)
             {
@@ -164,7 +164,7 @@ namespace Dohmoku
             }
 			return board[x, y] == 0;
 		}
-		public static bool IsPlacable(int[] xy)
+		public static bool IsPlacable(int[,] board, int[] xy)
 		{
 			if (xy.Length != 2)
 			{
@@ -172,15 +172,15 @@ namespace Dohmoku
 			}
 			else
 			{
-				return IsPlacable(xy[0], xy[1]);
+				return IsPlacable(board, xy[0], xy[1]);
 			}
 		}
 
 		void Place(Team team, int x, int y)			// Place team's stone in board[x, y]
 		{
-			if (IsPlacable(x, y))
+			if (IsPlacable(board, x, y))
 			{
-				board[x, y] = (int)team + 1;
+				board[x, y] = (int)team;
 			}
 			else
 			{
@@ -201,13 +201,12 @@ namespace Dohmoku
 
         bool IsEnded(Team team)
         {
-            int target = (int)team + 1;
             int count = 0;
             for (int i = 0; i < 19; i++)    // Check | form
             {
                 for (int j = 0; j < 19; j++)
                 {
-                    if (board[i, j] == target)
+                    if (board[i, j] == (int)team)
                     {
                         count++;
                         if (count >= 5)
@@ -226,7 +225,7 @@ namespace Dohmoku
             {
                 for (int j = 0; j < 19; j++)
                 {
-                    if (board[j, i] == target)
+                    if (board[j, i] == (int)team)
                     {
                         count++;
                         if (count >= 5)
@@ -245,11 +244,11 @@ namespace Dohmoku
             {
                 for (int j = 0; j < 15; j++)
                 {
-                    if (board[i, j] == target &&
-                        board[i + 1, j + 1] == target &&
-                        board[i + 2, j + 2] == target &&
-                        board[i + 3, j + 3] == target &&
-                        board[i + 4, j + 4] == target)
+                    if (board[i, j] == (int)team &&
+                        board[i + 1, j + 1] == (int)team &&
+                        board[i + 2, j + 2] == (int)team &&
+                        board[i + 3, j + 3] == (int)team &&
+                        board[i + 4, j + 4] == (int)team)
                     {
                         return true;
                     }
@@ -259,11 +258,11 @@ namespace Dohmoku
             {
                 for (int j = 0; j < 15; j++)
                 {
-                    if (board[i, j] == target &&
-                        board[i - 1, j + 1] == target &&
-                        board[i - 2, j + 2] == target &&
-                        board[i - 3, j + 3] == target &&
-                        board[i - 4, j + 4] == target)
+                    if (board[i, j] == (int)team &&
+                        board[i - 1, j + 1] == (int)team &&
+                        board[i - 2, j + 2] == (int)team &&
+                        board[i - 3, j + 3] == (int)team &&
+                        board[i - 4, j + 4] == (int)team)
                     {
                         return true;
                     }
