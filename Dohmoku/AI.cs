@@ -9,6 +9,7 @@ namespace Dohmoku
     class AI
     {
         public Team team;
+        int depth = 4;
 		
         public AI(Team playerTeam)
         {
@@ -17,6 +18,14 @@ namespace Dohmoku
 
         public int[] Think()		// Return AI's result coordination with an input of current board. TODO: make this method
         {
+            Tree tree = new Tree(Game.board);
+
+
+            for (int i = 0; i < depth; i++)
+            {
+                
+            }
+
             int[] result;
             do
             {
@@ -40,7 +49,7 @@ namespace Dohmoku
             return 0;
         }
 
-        double AlphaBeta(TreeNode node, int depth , double alpha, double beta, bool maximizing)
+        double AlphaBeta(Tree tree, int depth , double alpha, double beta, bool maximizing)
         {
             return 0;   // TODO
         }
@@ -49,12 +58,9 @@ namespace Dohmoku
     class Tree
     {
         // TODO: Make tree addchild deletechild
-    }
 
-    class TreeNode
-    {
-        TreeNode parent;
-        List<TreeNode> children;
+        Tree parent;
+        List<Tree> children;
 
         int[,] value;
         double heuristic;
@@ -62,5 +68,10 @@ namespace Dohmoku
         double alpha;
         double beta;
         bool maximizer;
+
+        public Tree(int [,] board)
+        {
+            value = board;
+        }
     }
 }
