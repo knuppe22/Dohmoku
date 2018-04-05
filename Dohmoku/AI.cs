@@ -53,6 +53,14 @@ namespace Dohmoku
 
     class TreeNode
     {
-        // TODO
+        TreeNode parent;
+        List<TreeNode> children;
+
+        int[,] value;
+        double heuristic;
+
+        double alpha;
+        double beta;
+        bool maximizer;
     }
 }
