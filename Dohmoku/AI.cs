@@ -5,13 +5,23 @@ namespace Dohmoku
 {
     class AI
     {
-        int maxDepth = 4;      // How deep AI can see?
+        int maxDepth = 3;      // How deep AI can see?
 
         public int[] Think()		// Return AI's result coordination with an input of current board. TODO: make this method
         {
-            Tree tree = new Tree(Game.player.Opposite(), Game.board);
-            MakeTree(tree, 0);
+            Tree root = new Tree(Game.player.Opposite(), -1, -1, Game.board);
+            MakeTree(root, 0);
+            DFS(root, 0);
+            for(int i = 0; i < root.children.Count; i++)
+            {
+                if (root.children[i].value == root.value)
+                {
+                    return root.children[i].xy;
+                }
+            }
+            throw new Exception("Something wrong");
 
+            /*
             int[] result;
             do
             {
@@ -19,6 +29,7 @@ namespace Dohmoku
             } while (!Game.IsPlacable(Game.board, result));
 
             return result;
+            */
         }
 
         int[] Random()				// Return 2 random integers from 0 to 18. For sample.
@@ -30,7 +41,7 @@ namespace Dohmoku
             return new int[2] { x, y };
         }
 
-        void MakeTree(Tree root, int depth)
+        void MakeTree(Tree tree, int depth)
         {
             if (depth < maxDepth)
             {
@@ -38,30 +49,120 @@ namespace Dohmoku
                 {
                     for (int j = 0; j < 19; j++)
                     {
-                        if (Game.IsPlacable(root.value, i, j))
+                        if (Game.IsPlacable(tree.state, i, j) && IsAdjacent(tree.state, i, j))
                         {
                             int[,] newBoard = new int[19, 19];
-                            Array.Copy(root.value, newBoard, root.value.Length);
-                            newBoard[i, j] = (int)(root.team.Opposite());
-                            root.AddChild(new Tree(root.team.Opposite(), newBoard));
+                            Array.Copy(tree.state, newBoard, tree.state.Length);
+                            newBoard[i, j] = (int)(tree.team);
+
+                            tree.AddChild(new Tree(tree.team.Opposite(), i, j, newBoard));
                         }
                     }
                 }
-                for (int i = 0; i < root.children.Count; i++)
+                for (int i = 0; i < tree.children.Count; i++)
                 {
-                    MakeTree(root.children[i], depth + 1);
+                    MakeTree(tree.children[i], depth + 1);
                 }
             }
         }
 
-        double AlphaBeta(Tree tree, int depth, double alpha, double beta, bool maximizing)
+        void DFS(Tree tree, int depth)
         {
-            return 0;   // TODO
+            for(int i = 0; i < tree.children.Count; i++)
+            {
+                DFS(tree.children[i], depth + 1);
+            }
+
+            tree.value = AlphaBeta(tree, depth, -2000000000, 2000000000);
+        }
+
+        int AlphaBeta(Tree tree, int depth, int alpha, int beta)   // TODO: Do this with DFS
+        {
+            if (depth == maxDepth)
+            {
+                return Calculate(tree.state);
+            }
+            if (tree.team == Game.player)   // Minimizer
+            {
+                int value = 2000000000;
+                for (int i = 0; i < tree.children.Count; i++)
+                {
+                    int tmp = AlphaBeta(tree.children[i], depth + 1, alpha, beta);
+                    if (value > tmp)
+                    {
+                        value = tmp;
+                    }
+                    if (beta > value)
+                    {
+                        beta = value;
+                    }
+                    if (beta <= alpha)
+                    {
+                        break;
+                    }
+                }
+
+                return value;
+            }
+            else                            // Maximizer
+            {
+                int value = -2000000000;
+                for(int i = 0; i < tree.children.Count; i++)
+                {
+                    int tmp = AlphaBeta(tree.children[i], depth + 1, alpha, beta);
+                    if (value < tmp)
+                    {
+                        value = tmp;
+                    }
+                    if (alpha < value)
+                    {
+                        alpha = value;
+                    }
+                    if (beta <= alpha)
+                    {
+                        break;
+                    }
+                }
+
+                return value;
+            }
+        }
+        
+        public static bool IsAdjacent(int[,] board, int x, int y)
+        {
+            for (int i = x - 2; i < x + 3; i++)
+            {
+                if (i < 0 || i > 18)
+                {
+                    continue;
+                }
+                for (int j = y - 2; j < y + 3; j++)
+                {
+                    if (j < 0 || j > 18)
+                    {
+                        continue;
+                    }
+                    if (board[i, j] != 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         // Evaluation function. TODO: fill this method
-        double Calculate(int[,] board)
+        int Calculate(int[,] board)
         {
+            if (Game.IsEnded(board, Game.player))
+            {
+                return -2000000000;
+            }
+            if (Game.IsEnded(board, Game.player.Opposite()))
+            {
+                return 2000000000;
+            }
             return 0;
         }
     }
@@ -72,16 +173,16 @@ namespace Dohmoku
         public List<Tree> children = new List<Tree>();
 
         public Team team;       // Who's turn at the value state?
-        public int[,] value = new int[19, 19];
-        public double heuristic;
+        public int[] xy = new int[2];
+        public int[,] state = new int[19, 19];
+        public int value;
 
-        public double alpha;
-        public double beta;
-
-        public Tree(Team team, int[,] board)
+        public Tree(Team team, int x, int y, int[,] board)
         {
             this.team = team;
-            Array.Copy(board, value, board.Length);
+            xy[0] = x;
+            xy[1] = y;
+            state = board;
         }
 
         public void AddChild(Tree child)

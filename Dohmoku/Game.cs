@@ -13,7 +13,7 @@ namespace Dohmoku
 
 	class Game
 	{
-		public static Team player;					    // Current player
+		public static Team player;					        // Current player
 		public static int[,] board = new int[19, 19];		// Gomoku board. Location is [column#, row#]. 0: empty, 1: black, 2: white
 		Team current = Team.Black;			// Current playing player
 		Team? winner = null;				// Winner of the game. Initialized by null.
@@ -64,7 +64,7 @@ namespace Dohmoku
                     Place(current, result);
                 }
 
-                if (IsEnded(current))
+                if (IsEnded(board, current))
                 {
                     winner = current;
                 }
@@ -199,7 +199,7 @@ namespace Dohmoku
             }
         }
 
-        bool IsEnded(Team team)
+        public static bool IsEnded(int [,] board, Team team)
         {
             int count = 0;
             for (int i = 0; i < 19; i++)    // Check | form
