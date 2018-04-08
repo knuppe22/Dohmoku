@@ -29,7 +29,10 @@ namespace Dohmoku
 		{
 			Console.Clear();
 			Console.WriteLine("Start!");
-
+            DrawBoard();
+            Console.WriteLine("Black team's turn. First stone should be placed on J10.");
+            Place(current, 9, 9);
+            current = current.Opposite();
 			while (winner == null)
 			{
 				DrawBoard();

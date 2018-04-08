@@ -11,7 +11,7 @@ namespace Dohmoku
         public static int maxValue = 2000000000;
         public static int minValue = -2000000000;
 
-        // Evaluation function. TODO: fill this method
+        // Evaluation function
         public static int Calculate(int[,] board)
         {
             if (Game.IsEnded(board, Game.player))
@@ -29,35 +29,26 @@ namespace Dohmoku
                 int sum = 0;
                 int flag = team == Game.player ? -1 : 1;
                 int count = 0;
-                // TODO
-                // 4x3
-                // 3x3
                 if ((count = OpenedFourInRow(board, team)) > 0)
                 {
                     sum += 125 * (int)Math.Pow(count, 2);
                 }
                 else if ((count = HalfClosedFourInRow(board, team)) > 0)
                 {
-                    sum += 50 * (int)Math.Pow(count, 2);
+                    sum += 70 * (int)Math.Pow(count, 2);
                 }
                 else if ((count = SeparatedFourInRow(board, team)) > 0)
                 {
-                    sum += 70 * (int)Math.Pow(count, 2);
+                    sum += 55 * (int)Math.Pow(count, 2);
                 }
                 else if ((count = OpenedThreeInRow(board, team)) > 0)
                 {
-                    sum += 40 * (int)Math.Pow(count, 2);
+                    sum += 60 * (int)Math.Pow(count, 2);
                 }
                 // SeparatedThree
                 result += sum * flag;
             }
             return result;
-        }
-        static int ThreeThree(int[,] board, Team team)
-        {
-            int count = 0;
-
-            return count;
         }
         static int OpenedFourInRow(int[,] board, Team team)
         {
@@ -379,71 +370,6 @@ namespace Dohmoku
                 }
             }
             return count;
-        }
-        bool FullyClosedFourInRow(int[,] board, Team team)
-        {
-            for (int i = 0; i < 19; i++)    // Check | form
-            {
-                for (int j = -1; j < 15; j++)
-                {
-                    if (((!Game.OnBoard(i, j) || board[i, j] == (int)team.Opposite())
-                            ^ (!Game.OnBoard(i, j + 5) || board[i, j + 5] == (int)team.Opposite())) &&
-                        board[i, j + 1] == (int)team &&
-                        board[i, j + 2] == (int)team &&
-                        board[i, j + 3] == (int)team &&
-                        board[i, j + 4] == (int)team
-                        )
-                    {
-                        return true;
-                    }
-                }
-            }
-            for (int i = -1; i < 15; i++)    // Check - form
-            {
-                for (int j = 0; j < 19; j++)
-                {
-                    if (((!Game.OnBoard(i, j) || board[i, j] == (int)team.Opposite())
-                            ^ (!Game.OnBoard(i + 5, j) || board[i + 5, j] == (int)team.Opposite())) &&
-                        board[i + 1, j] == (int)team &&
-                        board[i + 2, j] == (int)team &&
-                        board[i + 3, j] == (int)team &&
-                        board[i + 4, j] == (int)team)
-                    {
-                        return true;
-                    }
-                }
-            }
-            for (int i = -1; i < 15; i++)    // Check \ form
-            {
-                for (int j = -1; j < 15; j++)
-                {
-                    if (((!Game.OnBoard(i, j) || board[i, j] == (int)team.Opposite())
-                            ^ (!Game.OnBoard(i + 5, j + 5) || board[i + 5, j + 5] == (int)team.Opposite())) &&
-                        board[i + 1, j + 1] == (int)team &&
-                        board[i + 2, j + 2] == (int)team &&
-                        board[i + 3, j + 3] == (int)team &&
-                        board[i + 4, j + 4] == (int)team)
-                    {
-                        return true;
-                    }
-                }
-            }
-            for (int i = 2; i < 19; i++)    // Check / form
-            {
-                for (int j = 0; j < 16; j++)
-                {
-                    if (((!Game.OnBoard(i, j) || board[i, j] == (int)team.Opposite())
-                            ^ (!Game.OnBoard(i - 5, j + 5) || board[i - 5, j + 5] == (int)team.Opposite())) &&
-                        board[i - 1, j + 1] == (int)team &&
-                        board[i - 2, j + 2] == (int)team &&
-                        board[i - 3, j + 3] == (int)team &&
-                        board[i - 4, j + 4] == (int)team)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
         static int OpenedThreeInRow(int[,] board, Team team)
         {

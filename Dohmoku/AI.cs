@@ -6,17 +6,17 @@ namespace Dohmoku
 {
     class AI
     {
-        int maxDepth = 4;      // How deep AI can see?
+        int maxDepth = 4;       // How deep AI can see?
         int curDepth = 1;
-        long timeLimit = 10000;
+        long timeLimit = 10000; // Time limit
         Stopwatch stopwatch;
 
-        public int[] Think()		// Return AI's result coordination with an input of current board. TODO: make this method
+        public int[] Think()		// Return AI's result coordination with an input of current board.
         {
             stopwatch = Stopwatch.StartNew();
 
             int[] result = null;
-            for (curDepth = 2; curDepth <= maxDepth; curDepth += 2)
+            for (curDepth = 2; curDepth <= maxDepth; curDepth++)
             {
                 Tree root = new Tree(Game.player.Opposite(), -1, -1);
                 MakeTree(root, 0, Game.board);
@@ -92,13 +92,13 @@ namespace Dohmoku
             }
         }
 
-        int AlphaBeta(Tree tree, int depth, int alpha, int beta)
+        int AlphaBeta(Tree tree, int depth, int alpha, int beta)    // Mini-max & Alpha beta pruning
         {
             if (stopwatch.ElapsedMilliseconds >= timeLimit)
             {
                 return int.MinValue;
             }
-            if (tree.children.Count == 0)
+            if (tree.children.Count == 0)   // If leaf node
             {
                 return tree.value;
             }
@@ -148,7 +148,7 @@ namespace Dohmoku
             }
         }
         
-        public static bool IsAdjacent(int[,] board, int x, int y)
+        public static bool IsAdjacent(int[,] board, int x, int y)   // Is near to placed stones?
         {
             for (int i = x - 1; i < x + 2; i++)
             {
@@ -177,7 +177,7 @@ namespace Dohmoku
     {
         public List<Tree> children = new List<Tree>();
 
-        public Team team;       // Who's turn at the value state?
+        public Team team;       // Who's turn at this state?
         public int[] xy = new int[2];   // Different cell
         public int value;
 
