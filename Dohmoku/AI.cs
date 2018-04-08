@@ -5,15 +5,13 @@ namespace Dohmoku
 {
     class AI
     {
-        int maxDepth = 3;      // How deep AI can see?
-        int maxValue = 2000000000;
-        int minValue = -2000000000;
+        int maxDepth = 2;      // How deep AI can see?
 
         public int[] Think()		// Return AI's result coordination with an input of current board. TODO: make this method
         {
             Tree root = new Tree(Game.player.Opposite(), -1, -1);
             MakeTree(root, 0, Game.board);
-            root.value = AlphaBeta(root, 0, minValue, maxValue);
+            root.value = AlphaBeta(root, 0, Heuristics.minValue, Heuristics.maxValue);
 
             for (int i = 0; i < root.children.Count; i++)
             {
@@ -61,26 +59,33 @@ namespace Dohmoku
                             newState[i, j] = (int)(tree.team);
 
                             tree.AddChild(newTree);
-                            MakeTree(newTree, depth + 1, newState);
+                            if (Game.IsEnded(newState, tree.team))
+                            {
+                                tree.value = Heuristics.Calculate(newState);
+                            }
+                            else
+                            {
+                                MakeTree(newTree, depth + 1, newState);
+                            }
                         }
                     }
                 }
             }
             else if (depth == maxDepth)
             {
-                tree.value = Calculate(state);
+                tree.value = Heuristics.Calculate(state);
             }
         }
 
-        int AlphaBeta(Tree tree, int depth, int alpha, int beta)   // TODO: Do this with DFS
+        int AlphaBeta(Tree tree, int depth, int alpha, int beta)
         {
-            if (depth == maxDepth)
+            if (tree.children.Count == 0)
             {
                 return tree.value;
             }
             if (tree.team == Game.player)   // Minimizer
             {
-                int value = maxValue;
+                int value = Heuristics.maxValue;
                 for (int i = 0; i < tree.children.Count; i++)
                 {
                     tree.children[i].value = AlphaBeta(tree.children[i], depth + 1, alpha, beta);
@@ -102,7 +107,7 @@ namespace Dohmoku
             }
             else                            // Maximizer
             {
-                int value = minValue;
+                int value = Heuristics.minValue;
                 for(int i = 0; i < tree.children.Count; i++)
                 {
                     tree.children[i].value = AlphaBeta(tree.children[i], depth + 1, alpha, beta);
@@ -146,28 +151,6 @@ namespace Dohmoku
             }
 
             return false;
-        }
-
-        // Evaluation function. TODO: fill this method
-        int Calculate(int[,] board)
-        {
-            if (Game.IsEnded(board, Game.player.Opposite()))
-            {
-                return maxValue;
-            }
-            else if (Game.IsEnded(board, Game.player))
-            {
-                return minValue;
-            }
-
-            int result = 0;
-            foreach (Team team in Enum.GetValues(typeof(Team)))
-            {
-                int sum = 0;
-                int flag = team == Game.player ? -1 : 1;
-                // TODO
-            }
-            return result;
         }
     }
 
