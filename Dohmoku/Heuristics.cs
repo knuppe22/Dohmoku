@@ -31,14 +31,23 @@ namespace Dohmoku
                 // TODO
                 // 4x3
                 // 3x3
-                if (OpenedFourInARow(board, team) > 0)
+                if (OpenedFourInRow(board, team) > 0)
                 {
-                    sum += 75 * (int)Math.Pow(OpenedFourInARow(board, team), 2);
+                    sum += 125 * (int)Math.Pow(OpenedFourInRow(board, team), 2);
                 }
-                else if (HalfClosedFourInARow(board, team) > 0)
+                else if (HalfClosedFourInRow(board, team) > 0)
                 {
-                    sum += 25 * (int)Math.Pow(HalfClosedFourInARow(board, team), 2);
+                    sum += 50 * (int)Math.Pow(HalfClosedFourInRow(board, team), 2);
                 }
+                else if (SeparatedFourInRow(board, team) > 0)
+                {
+                    sum += 70 * (int)Math.Pow(SeparatedFourInRow(board, team), 2);
+                }
+                else if (OpenedThreeInRow(board, team) > 0)
+                {
+                    sum += 40 * (int)Math.Pow(OpenedThreeInRow(board, team), 2);
+                }
+                // SeparatedThree
                 result += sum * flag;
             }
             return result;
@@ -49,7 +58,72 @@ namespace Dohmoku
 
             return count;
         }
-        static int OpenedFourInARow(int[,] board, Team team)
+        static int OpenedFourInRow(int[,] board, Team team)
+        {
+            int count = 0;
+            for (int i = 0; i < 19; i++)    // Check | form
+            {
+                for (int j = 0; j < 14; j++)
+                {
+                    if (board[i, j] == 0 &&
+                        board[i, j + 1] == (int)team &&
+                        board[i, j + 2] == (int)team &&
+                        board[i, j + 3] == (int)team &&
+                        board[i, j + 4] == (int)team &&
+                        board[i, j + 5] == 0)
+                    {
+                        count++;
+                    }
+                }
+            }
+            for (int i = 0; i < 14; i++)    // Check - form
+            {
+                for (int j = 0; j < 19; j++)
+                {
+                    if (board[i, j] == 0 &&
+                        board[i + 1, j] == (int)team &&
+                        board[i + 2, j] == (int)team &&
+                        board[i + 3, j] == (int)team &&
+                        board[i + 4, j] == (int)team &&
+                        board[i + 5, j] == 0)
+                    {
+                        count++;
+                    }
+                }
+            }
+            for (int i = 0; i < 14; i++)    // Check \ form
+            {
+                for (int j = 0; j < 14; j++)
+                {
+                    if (board[i, j] == 0 &&
+                        board[i + 1, j + 1] == (int)team &&
+                        board[i + 2, j + 2] == (int)team &&
+                        board[i + 3, j + 3] == (int)team &&
+                        board[i + 4, j + 4] == (int)team &&
+                        board[i + 5, j + 5] == 0)
+                    {
+                        count++;
+                    }
+                }
+            }
+            for (int i = 5; i < 19; i++)    // Check / form
+            {
+                for (int j = 0; j < 14; j++)
+                {
+                    if (board[i, j] == 0 &&
+                        board[i - 1, j + 1] == (int)team &&
+                        board[i - 2, j + 2] == (int)team &&
+                        board[i - 3, j + 3] == (int)team &&
+                        board[i - 4, j + 4] == (int)team &&
+                        board[i - 5, j + 5] == 0)
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+        static int ClosedFourInRow(int[,] board, Team team)
         {
             int count = 0;
             for (int i = 0; i < 19; i++)    // Check | form
@@ -114,7 +188,7 @@ namespace Dohmoku
             }
             return count;
         }
-        static int HalfClosedFourInARow(int[,] board, Team team)
+        static int HalfClosedFourInRow(int[,] board, Team team)
         {
             int count = 0;
             for (int i = 0; i < 19; i++)    // Check | form
@@ -163,9 +237,9 @@ namespace Dohmoku
                     }
                 }
             }
-            for (int i = 2; i < 19; i++)    // Check / form
+            for (int i = 4; i < 19; i++)    // Check / form
             {
-                for (int j = 0; j < 16; j++)
+                for (int j = -1; j < 15; j++)
                 {
                     if (((!Game.OnBoard(i, j) || board[i, j] == (int)team.Opposite())
                             ^ (!Game.OnBoard(i - 5, j + 5) || board[i - 5, j + 5] == (int)team.Opposite())) &&
@@ -180,7 +254,132 @@ namespace Dohmoku
             }
             return count;
         }
-        bool FullyClosedFourInARow(int[,] board, Team team)
+        static int SeparatedFourInRow(int[,] board, Team team)
+        {
+            int count = 0;
+            for (int i = 0; i < 19; i++)    // Check | form
+            {
+                for (int j = 0; j < 15; j++)
+                {
+                    if (board[i, j] == (int)team &&
+                        board[i, j + 1] == 0 &&
+                        board[i, j + 2] == (int)team &&
+                        board[i, j + 3] == (int)team &&
+                        board[i, j + 4] == (int)team)
+                    {
+                        count++;
+                    }
+                    else if (board[i, j] == (int)team &&
+                        board[i, j + 1] == (int)team &&
+                        board[i, j + 2] == 0 &&
+                        board[i, j + 3] == (int)team &&
+                        board[i, j + 4] == (int)team)
+                    {
+                        count++;
+                    }
+                    else if (board[i, j] == (int)team &&
+                        board[i, j + 1] == (int)team &&
+                        board[i, j + 2] == (int)team &&
+                        board[i, j + 3] == 0 &&
+                        board[i, j + 4] == (int)team)
+                    {
+                        count++;
+                    }
+                }
+            }
+            for (int i = 0; i < 15; i++)    // Check - form
+            {
+                for (int j = 0; j < 19; j++)
+                {
+                    if (board[i, j] == (int)team &&
+                        board[i + 1, j] == 0 &&
+                        board[i + 2, j] == (int)team &&
+                        board[i + 3, j] == (int)team &&
+                        board[i + 4, j] == (int)team)
+                    {
+                        count++;
+                    }
+                    else if (board[i, j] == (int)team &&
+                        board[i + 1, j] == (int)team &&
+                        board[i + 2, j] == 0 &&
+                        board[i + 3, j] == (int)team &&
+                        board[i + 4, j] == (int)team)
+                    {
+                        count++;
+                    }
+                    else if (board[i, j] == (int)team &&
+                        board[i + 1, j] == (int)team &&
+                        board[i + 2, j] == (int)team &&
+                        board[i + 3, j] == 0 &&
+                        board[i + 4, j] == (int)team)
+                    {
+                        count++;
+                    }
+                }
+            }
+            for (int i = 0; i < 15; i++)    // Check \ form
+            {
+                for (int j = 0; j < 15; j++)
+                {
+                    if (board[i, j] == (int)team &&
+                        board[i + 1, j + 1] == 0 &&
+                        board[i + 2, j + 2] == (int)team &&
+                        board[i + 3, j + 3] == (int)team &&
+                        board[i + 4, j + 4] == (int)team)
+                    {
+                        count++;
+                    }
+                    else if (board[i, j] == (int)team &&
+                       board[i + 1, j + 1] == (int)team &&
+                       board[i + 2, j + 2] == 0 &&
+                       board[i + 3, j + 3] == (int)team &&
+                       board[i + 4, j + 4] == (int)team)
+                    {
+                        count++;
+                    }
+                    else if (board[i, j] == (int)team &&
+                       board[i + 1, j + 1] == (int)team &&
+                       board[i + 2, j + 2] == (int)team &&
+                       board[i + 3, j + 3] == 0 &&
+                       board[i + 4, j + 4] == (int)team)
+                    {
+                        count++;
+                    }
+                }
+            }
+            for (int i = 4; i < 19; i++)    // Check / form
+            {
+                for (int j = 0; j < 15; j++)
+                {
+                    if (board[i, j] == (int)team &&
+                        board[i - 1, j + 1] == 0 &&
+                        board[i - 2, j + 2] == (int)team &&
+                        board[i - 3, j + 3] == (int)team &&
+                        board[i - 4, j + 4] == (int)team)
+                    {
+                        count++;
+                    }
+                    else if (board[i, j] == (int)team &&
+                       board[i - 1, j + 1] == (int)team &&
+                       board[i - 2, j + 2] == 0 &&
+                       board[i - 3, j + 3] == (int)team &&
+                       board[i - 4, j + 4] == (int)team)
+                    {
+                        count++;
+                    }
+                    else if (board[i, j] == (int)team &&
+                       board[i - 1, j + 1] == (int)team &&
+                       board[i - 2, j + 2] == (int)team &&
+                       board[i - 3, j + 3] == 0 &&
+                       board[i - 4, j + 4] == (int)team)
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+        bool FullyClosedFourInRow(int[,] board, Team team)
         {
             for (int i = 0; i < 19; i++)    // Check | form
             {
@@ -245,141 +444,66 @@ namespace Dohmoku
             }
             return false;
         }
-        bool FourInARow(int[,] board, Team team)
+        static int OpenedThreeInRow(int[,] board, Team team)
         {
             int count = 0;
             for (int i = 0; i < 19; i++)    // Check | form
             {
-                for (int j = 0; j < 19; j++)
+                for (int j = 0; j < 15; j++)
                 {
-                    if (board[i, j] == (int)team)
+                    if (board[i, j] == 0 &&
+                        board[i, j + 1] == (int)team &&
+                        board[i, j + 2] == (int)team &&
+                        board[i, j + 3] == (int)team &&
+                        board[i, j + 4] == 0)
                     {
                         count++;
-                        if (count >= 4)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
                     }
                 }
-                count = 0;
             }
-            for (int i = 0; i < 19; i++)    // Check - form
+            for (int i = 0; i < 15; i++)    // Check - form
             {
                 for (int j = 0; j < 19; j++)
                 {
-                    if (board[j, i] == (int)team)
+                    if (board[i, j] == 0 &&
+                        board[i + 1, j] == (int)team &&
+                        board[i + 2, j] == (int)team &&
+                        board[i + 3, j] == (int)team &&
+                        board[i + 4, j] == 0)
                     {
                         count++;
-                        if (count >= 4)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
                     }
                 }
-                count = 0;
             }
-            for (int i = 0; i < 16; i++)    // Check \ form
+            for (int i = 0; i < 15; i++)    // Check \ form
             {
-                for (int j = 0; j < 16; j++)
+                for (int j = 0; j < 15; j++)
                 {
-                    if (board[i, j] == (int)team &&
+                    if (board[i, j] == 0 &&
                         board[i + 1, j + 1] == (int)team &&
                         board[i + 2, j + 2] == (int)team &&
-                        board[i + 3, j + 3] == (int)team)
+                        board[i + 3, j + 3] == (int)team &&
+                        board[i + 4, j + 4] == 0)
                     {
-                        return true;
+                        count++;
                     }
                 }
             }
-            for (int i = 2; i < 19; i++)    // Check / form
+            for (int i = 4; i < 19; i++)    // Check / form
             {
-                for (int j = 0; j < 16; j++)
+                for (int j = 0; j < 15; j++)
                 {
-                    if (board[i, j] == (int)team &&
+                    if (board[i, j] == 0 &&
                         board[i - 1, j + 1] == (int)team &&
                         board[i - 2, j + 2] == (int)team &&
-                        board[i - 3, j + 3] == (int)team)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        bool ThreeInARow(int[,] board, Team team)
-        {
-            int count = 0;
-            for (int i = 0; i < 19; i++)    // Check | form
-            {
-                for (int j = 0; j < 19; j++)
-                {
-                    if (board[i, j] == (int)team)
+                        board[i - 3, j + 3] == (int)team &&
+                        board[i - 4, j + 4] == 0)
                     {
                         count++;
-                        if (count >= 3)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
-                    }
-                }
-                count = 0;
-            }
-            for (int i = 0; i < 19; i++)    // Check - form
-            {
-                for (int j = 0; j < 19; j++)
-                {
-                    if (board[j, i] == (int)team)
-                    {
-                        count++;
-                        if (count >= 3)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
-                    }
-                }
-                count = 0;
-            }
-            for (int i = 0; i < 17; i++)    // Check \ form
-            {
-                for (int j = 0; j < 17; j++)
-                {
-                    if (board[i, j] == (int)team &&
-                        board[i + 1, j + 1] == (int)team &&
-                        board[i + 2, j + 2] == (int)team)
-                    {
-                        return true;
                     }
                 }
             }
-            for (int i = 2; i < 19; i++)    // Check / form
-            {
-                for (int j = 0; j < 17; j++)
-                {
-                    if (board[i, j] == (int)team &&
-                        board[i - 1, j + 1] == (int)team &&
-                        board[i - 2, j + 2] == (int)team)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            return count;
         }
     }
 }

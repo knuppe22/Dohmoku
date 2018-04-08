@@ -5,7 +5,7 @@ namespace Dohmoku
 {
     class AI
     {
-        int maxDepth = 2;      // How deep AI can see?
+        int maxDepth = 3;      // How deep AI can see?
 
         public int[] Think()		// Return AI's result coordination with an input of current board. TODO: make this method
         {
