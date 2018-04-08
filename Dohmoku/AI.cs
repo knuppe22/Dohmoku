@@ -6,13 +6,16 @@ namespace Dohmoku
     class AI
     {
         int maxDepth = 3;      // How deep AI can see?
+        int maxValue = 2000000000;
+        int minValue = -2000000000;
 
         public int[] Think()		// Return AI's result coordination with an input of current board. TODO: make this method
         {
-            Tree root = new Tree(Game.player.Opposite(), -1, -1, Game.board);
-            MakeTree(root, 0);
-            DFS(root, 0);
-            for(int i = 0; i < root.children.Count; i++)
+            Tree root = new Tree(Game.player.Opposite(), -1, -1);
+            MakeTree(root, 0, Game.board);
+            root.value = AlphaBeta(root, 0, minValue, maxValue);
+
+            for (int i = 0; i < root.children.Count; i++)
             {
                 if (root.children[i].value == root.value)
                 {
@@ -41,7 +44,7 @@ namespace Dohmoku
             return new int[2] { x, y };
         }
 
-        void MakeTree(Tree tree, int depth)
+        void MakeTree(Tree tree, int depth, int[,] state)
         {
             if (depth < maxDepth)
             {
@@ -49,48 +52,41 @@ namespace Dohmoku
                 {
                     for (int j = 0; j < 19; j++)
                     {
-                        if (Game.IsPlacable(tree.state, i, j) && IsAdjacent(tree.state, i, j))
+                        if (Game.IsPlacable(state, i, j) && IsAdjacent(state, i, j))
                         {
-                            int[,] newBoard = new int[19, 19];
-                            Array.Copy(tree.state, newBoard, tree.state.Length);
-                            newBoard[i, j] = (int)(tree.team);
+                            Tree newTree = new Tree(tree.team.Opposite(), i, j);
+                            int[,] newState = new int[19, 19];
 
-                            tree.AddChild(new Tree(tree.team.Opposite(), i, j, newBoard));
+                            Array.Copy(state, newState, state.Length);
+                            newState[i, j] = (int)(tree.team);
+
+                            tree.AddChild(newTree);
+                            MakeTree(newTree, depth + 1, newState);
                         }
                     }
                 }
-                for (int i = 0; i < tree.children.Count; i++)
-                {
-                    MakeTree(tree.children[i], depth + 1);
-                }
             }
-        }
-
-        void DFS(Tree tree, int depth)
-        {
-            for(int i = 0; i < tree.children.Count; i++)
+            else if (depth == maxDepth)
             {
-                DFS(tree.children[i], depth + 1);
+                tree.value = Calculate(state);
             }
-
-            tree.value = AlphaBeta(tree, depth, -2000000000, 2000000000);
         }
 
         int AlphaBeta(Tree tree, int depth, int alpha, int beta)   // TODO: Do this with DFS
         {
             if (depth == maxDepth)
             {
-                return Calculate(tree.state);
+                return tree.value;
             }
             if (tree.team == Game.player)   // Minimizer
             {
-                int value = 2000000000;
+                int value = maxValue;
                 for (int i = 0; i < tree.children.Count; i++)
                 {
-                    int tmp = AlphaBeta(tree.children[i], depth + 1, alpha, beta);
-                    if (value > tmp)
+                    tree.children[i].value = AlphaBeta(tree.children[i], depth + 1, alpha, beta);
+                    if (value > tree.children[i].value)
                     {
-                        value = tmp;
+                        value = tree.children[i].value;
                     }
                     if (beta > value)
                     {
@@ -106,13 +102,13 @@ namespace Dohmoku
             }
             else                            // Maximizer
             {
-                int value = -2000000000;
+                int value = minValue;
                 for(int i = 0; i < tree.children.Count; i++)
                 {
-                    int tmp = AlphaBeta(tree.children[i], depth + 1, alpha, beta);
-                    if (value < tmp)
+                    tree.children[i].value = AlphaBeta(tree.children[i], depth + 1, alpha, beta);
+                    if (value < tree.children[i].value)
                     {
-                        value = tmp;
+                        value = tree.children[i].value;
                     }
                     if (alpha < value)
                     {
@@ -155,40 +151,44 @@ namespace Dohmoku
         // Evaluation function. TODO: fill this method
         int Calculate(int[,] board)
         {
-            if (Game.IsEnded(board, Game.player))
-            {
-                return -2000000000;
-            }
             if (Game.IsEnded(board, Game.player.Opposite()))
             {
-                return 2000000000;
+                return maxValue;
             }
-            return 0;
+            else if (Game.IsEnded(board, Game.player))
+            {
+                return minValue;
+            }
+
+            int result = 0;
+            foreach (Team team in Enum.GetValues(typeof(Team)))
+            {
+                int sum = 0;
+                int flag = team == Game.player ? -1 : 1;
+                // TODO
+            }
+            return result;
         }
     }
 
     class Tree
     {
-        public Tree parent = null;
         public List<Tree> children = new List<Tree>();
 
         public Team team;       // Who's turn at the value state?
-        public int[] xy = new int[2];
-        public int[,] state = new int[19, 19];
+        public int[] xy = new int[2];   // Different cell
         public int value;
 
-        public Tree(Team team, int x, int y, int[,] board)
+        public Tree(Team team, int x, int y)
         {
             this.team = team;
             xy[0] = x;
             xy[1] = y;
-            state = board;
         }
 
         public void AddChild(Tree child)
         {
             children.Add(child);
-            child.parent = this;
         }
     }
 }

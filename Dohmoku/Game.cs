@@ -7,7 +7,7 @@ namespace Dohmoku
 	{
 		public static Team Opposite(this Team team)
 		{
-			return (Team)((int)team % 2 + 1);
+			return (Team)(3 - (int)team);
 		}
 	}
 
@@ -156,13 +156,13 @@ namespace Dohmoku
             return null;
         }
 
+        public static bool OnBoard(int x, int y)
+        {
+            return x >= 0 && x < 19 && y >= 0 && y < 19;
+        }
 		public static bool IsPlacable(int[,] board, int x, int y)	// Is board[x, y] is empty?
 		{
-            if (x < 0 || x > 18 || y < 0 || y > 18)
-            {
-                return false;
-            }
-			return board[x, y] == 0;
+			return OnBoard(x, y) && board[x, y] == 0;
 		}
 		public static bool IsPlacable(int[,] board, int[] xy)
 		{
