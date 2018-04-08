@@ -14,13 +14,13 @@ namespace Dohmoku
         // Evaluation function. TODO: fill this method
         public static int Calculate(int[,] board)
         {
-            if (Game.IsEnded(board, Game.player.Opposite()))
-            {
-                return maxValue;
-            }
-            else if (Game.IsEnded(board, Game.player))
+            if (Game.IsEnded(board, Game.player))
             {
                 return minValue;
+            }
+            else if (Game.IsEnded(board, Game.player.Opposite()))
+            {
+                return maxValue;
             }
 
             int result = 0;
@@ -28,24 +28,25 @@ namespace Dohmoku
             {
                 int sum = 0;
                 int flag = team == Game.player ? -1 : 1;
+                int count = 0;
                 // TODO
                 // 4x3
                 // 3x3
-                if (OpenedFourInRow(board, team) > 0)
+                if ((count = OpenedFourInRow(board, team)) > 0)
                 {
-                    sum += 125 * (int)Math.Pow(OpenedFourInRow(board, team), 2);
+                    sum += 125 * (int)Math.Pow(count, 2);
                 }
-                else if (HalfClosedFourInRow(board, team) > 0)
+                else if ((count = HalfClosedFourInRow(board, team)) > 0)
                 {
-                    sum += 50 * (int)Math.Pow(HalfClosedFourInRow(board, team), 2);
+                    sum += 50 * (int)Math.Pow(count, 2);
                 }
-                else if (SeparatedFourInRow(board, team) > 0)
+                else if ((count = SeparatedFourInRow(board, team)) > 0)
                 {
-                    sum += 70 * (int)Math.Pow(SeparatedFourInRow(board, team), 2);
+                    sum += 70 * (int)Math.Pow(count, 2);
                 }
-                else if (OpenedThreeInRow(board, team) > 0)
+                else if ((count = OpenedThreeInRow(board, team)) > 0)
                 {
-                    sum += 40 * (int)Math.Pow(OpenedThreeInRow(board, team), 2);
+                    sum += 40 * (int)Math.Pow(count, 2);
                 }
                 // SeparatedThree
                 result += sum * flag;

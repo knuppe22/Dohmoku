@@ -201,44 +201,33 @@ namespace Dohmoku
 
         public static bool IsEnded(int [,] board, Team team)
         {
-            int count = 0;
             for (int i = 0; i < 19; i++)    // Check | form
             {
-                for (int j = 0; j < 19; j++)
+                for (int j = 0; j < 15; j++)
                 {
-                    if (board[i, j] == (int)team)
+                    if (board[i, j] == (int)team &&
+                        board[i, j + 1] == (int)team &&
+                        board[i, j + 2] == (int)team &&
+                        board[i, j + 3] == (int)team &&
+                        board[i, j + 4] == (int)team)
                     {
-                        count++;
-                        if (count >= 5)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
+                        return true;
                     }
                 }
-                count = 0;
             }
-            for (int i = 0; i < 19; i++)    // Check - form
+            for (int i = 0; i < 15; i++)    // Check - form
             {
                 for (int j = 0; j < 19; j++)
                 {
-                    if (board[j, i] == (int)team)
+                    if (board[i, j] == (int)team &&
+                        board[i + 1, j] == (int)team &&
+                        board[i + 2, j] == (int)team &&
+                        board[i + 3, j] == (int)team &&
+                        board[i + 4, j] == (int)team)
                     {
-                        count++;
-                        if (count >= 5)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        count = 0;
+                        return true;
                     }
                 }
-                count = 0;
             }
             for (int i = 0; i < 15; i++)    // Check \ form
             {
